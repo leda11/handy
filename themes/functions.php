@@ -8,25 +8,15 @@
 * Create a url by prepending the base_url.
 */
 function base_url($url) {
-  return CLydia::Instance()->request->base_url . trim($url, '/');
+  return CHandy::Instance()->request->base_url . trim($url, '/');
 }
 
 /**
 * Return the current url.
 */
 function current_url() {
-  return CLydia::Instance()->request->current_url;
+  return CHandy::Instance()->request->current_url;
 }
-
-
-/**
-* Helpers for the template file. GLOBAL (inkluderas i CHandy::ThemeEngineRender()
-*/
-$ha->data['header'] = '<h1>Header: Handy MVC</h1>';
-$ha->data['main']   = '<p>Main: Now with a theme engine, Not much more to report for now.</p>';
-$ha->data['footer'] = '<p>Footer: &copy; Lena Dackhammar (copy - Lydia by Mikael Roos (mos@dbwebb.se)</p>';
-
-
 
 /**
 * Print debuginformation from the framework.

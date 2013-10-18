@@ -105,6 +105,7 @@ class CHandy implements ISingleton {
 
     // Include the global functions.php and the functions.php that are part of the theme
     $ha = &$this;
+    include(HANDY_INSTALL_PATH . '/themes/functions.php');
     $functionsPath = "{$themePath}/functions.php";
     if(is_file($functionsPath)) {
       include $functionsPath;

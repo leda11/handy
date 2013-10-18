@@ -2,7 +2,7 @@
 /**
 * Parse the request and identify controller, method and arguments.
 *
-* @package LydiaCore
+* @package HandyCore
 */
 class CRequest {
 
@@ -15,10 +15,24 @@ class CRequest {
     // 1./controller/method/arg1/arg2/arg3
     // 2. ToDo - index.php/controller/method/arg1/arg2/arg3
     // 3. ToDo - index.php?q=/controller/method/arg1/arg2/arg3
-    $request_uri  = $_SERVER['REQUEST_URI']; //ny
-    $scriptName  = $_SERVER['SCRIPT_NAME']; //ny
-    $query =substr($request_uri, strlen(rtrim(dirname($scriptName), '/')));//ändrad
-    $splits = explode('/', trim($query, '/'));
+    $requestUri  = $_SERVER['REQUEST_URI']; //ny 05
+    $scriptPart = $scriptName  = $_SERVER['SCRIPT_NAME']; //ny 05
+    
+    // (06)  Check if url is in format controller/method/arg1/arg2/arg3
+    if(substr_compare($requestUri, $scriptName, 0, strlen($scriptName))) {
+      $scriptPart = dirname($scriptName);
+    }
+    
+    $query = trim(substr($requestUri, strlen(rtrim($scriptPart, '/'))), '/');   
+    // Check if this looks like a querystring approach link
+    if(substr($query, 0, 1) === '?' && isset($_GET['q'])) {
+      $query = trim($_GET['q']);
+    }
+    $splits = explode('/', $query);
+    // --------------------------------------------------------------------
+    
+   // $query =substr($request_uri, strlen(rtrim(dirname($scriptName), '/')));//ändrad (05)
+    // 05 05 $splits = explode('/', trim($query, '/'));
     /*
     $query = substr($_SERVER['REQUEST_URI'], strlen(rtrim(dirname($_SERVER['SCRIPT_NAME']), '/')));
     */
@@ -27,8 +41,6 @@ class CRequest {
     $method       =  !empty($splits[1]) ? $splits[1] : 'index';
     $arguments = $splits;
     unset($arguments[0], $arguments[1]); // remove controller & method part from argument list
-   
-    // Store it
     
     // Prepare to create current_url and base_url (05)
     $currentUrl = $this->GetCurrentUrl();
@@ -38,6 +50,7 @@ class CRequest {
     // Store it (05)
     $this->base_url      = rtrim($baseUrl, '/') . '/';
     $this->current_url  = $currentUrl;
+    $this->request_uri = $requestUri; // (06)
     $this->script_name = $scriptName;
     $this->query         = $query;
     $this->splits         = $splits;
@@ -60,4 +73,20 @@ class CRequest {
     return $url;
   }
 
+  
+    /**
+   * Create a url in the way it should be created. (06)
+   *
+   */
+  public function CreateUrl($url=null) {
+    $prepend = $this->base_url;
+    if($this->cleanUrl) {
+      ;
+    } elseif ($this->querystringUrl) {
+      $prepend .= 'index.php?q=';
+    } else {
+      $prepend .= 'index.php/';
+    }
+    return $prepend . rtrim($url, '/');
+  }
 }
